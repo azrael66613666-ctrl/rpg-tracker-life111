@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#1a1d23">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Life RPG">
+    <title>Life RPG Tracker</title>
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Life%20RPG%20Tracker%22%2C%22short_name%22%3A%22Life%20RPG%22%2C%22description%22%3A%22%D0%A2%D1%80%D0%B5%D0%BA%D0%B5%D1%80%20%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D1%8F%20%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%BD%D0%B0%D0%B6%D0%B0%22%2C%22start_url%22%3A%22.%2F%22%2C%22scope%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%231a1d23%22%2C%22theme_color%22%3A%22%231a1d23%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Crect%20width%3D'100'%20height%3D'100'%20rx%3D'20'%20fill%3D'%231a1d23'%2F%3E%3Ctext%20x%3D'50'%20y%3D'65'%20text-anchor%3D'middle'%20font-size%3D'50'%3E⚔️%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22100x100%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20512%20512'%3E%3Crect%20width%3D'512'%20height%3D'512'%20rx%3D'100'%20fill%3D'%231a1d23'%2F%3E%3Ctext%20x%3D'256'%20y%3D'330'%20text-anchor%3D'middle'%20font-size%3D'250'%3E⚔️%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+    
+    <style>
+        :root {
+            --bg: #1a1d23; --card: #21252b; --card2: #282c34; --border: #333842;
+            --text: #c0c5ce; --text2: #7a8290; --text3: #4a525e;
+            --accent: #6b8a7a; --accent-light: #7a9a8a;
+            --gold: #c4a44a; --gold-light: #d4b85a;
+            --red: #8b5555; --green: #5a7a5a; --blue: #557a8b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #15181d; color: var(--text);
+            font-family: 'Georgia', 'Times New Roman', serif;
+            padding: 8px; min-height: 100vh; line-height: 1.6;
+            background-image: radial-gradient(ellipse at 50% 0%, #1e2229 0%, #15181d 60%);
+        }
+        .app {
+            max-width: 540px; margin: 0 auto; background: var(--card);
+            border-radius: 6px; padding: 20px 18px; border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        .app-title {
+            text-align: center; font-size: 22px; color: var(--gold);
+            font-weight: normal; letter-spacing: 4px; text-transform: uppercase;
+            margin-bottom: 2px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .app-subtitle {
+            text-align: center; font-size: 9px; color: var(--text2);
+            letter-spacing: 3px; margin-bottom: 6px; text-transform: uppercase;
+        }
+        .datetime {
+            text-align: center; font-size: 9px; color: var(--text3);
+            letter-spacing: 1px; margin-bottom: 14px; font-style: italic;
+        }
+        
+        .data-actions {
+            display: flex; gap: 6px; margin-bottom: 14px; justify-content: center;
+        }
+        .data-btn {
+            padding: 6px 14px; background: transparent; border: 1px solid var(--border);
+            color: var(--text2); cursor: pointer; font-size: 9px;
+            text-transform: uppercase; letter-spacing: 1px; font-family: inherit;
+            transition: 0.2s;
+        }
+        .data-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .data-btn.export { border-color: rgba(90,122,90,0.5); color: var(--green); }
+        .data-btn.export:hover { border-color: var(--green); background: rgba(90,122,90,0.08); }
+        .data-btn.import { border-color: rgba(85,122,139,0.5); color: var(--blue); }
+        .data-btn.import:hover { border-color: var(--blue); background: rgba(85,122,139,0.08); }
+        
+        .tabs {
+            display: flex; gap: 1px; margin-bottom: 18px;
+            border-bottom: 1px solid var(--border); flex-wrap: wrap;
+        }
+        .tab {
+            flex: 1; min-width: 55px; padding: 10px 4px; text-align: center;
+            cursor: pointer; font-size: 9px; letter-spacing: 1px;
+            text-transform: uppercase; background: transparent; border: none;
+            color: var(--text2); border-bottom: 2px solid transparent;
+            transition: 0.25s; font-family: inherit;
+        }
+        .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+        .tab:hover { color: #9a9a9a; }
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .stats-card {
+            background: var(--card2); border: 1px solid var(--border);
+            padding: 16px 14px; margin-bottom: 16px; position: relative; overflow: hidden;
+        }
+        .stats-card::before {
+            content: ''; position: absolute; top: -20px; left: 50%;
+            transform: translateX(-50%); width: 120px; height: 40px;
+            background: radial-gradient(ellipse, rgba(196,164,74,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .stats-row { display: flex; gap: 10px; }
+        .stat-item {
+            flex: 1; text-align: center; padding: 12px 8px;
+            background: var(--bg); border: 1px solid var(--border); position: relative;
+        }
+        .stat-item::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(196,164,74,0.3), transparent);
+        }
+        .stat-value { font-size: 30px; color: var(--accent); font-weight: normal; }
+        .stat-label { font-size: 8px; color: var(--text2); text-transform: uppercase; letter-spacing: 2px; }
+        .stat-detail { font-size: 8px; color: #555; margin-top: 3px; }
+
+        .category { margin-bottom: 8px; }
+        .category-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 14px; background: var(--card2); border: 1px solid var(--border);
+            cursor: pointer; user-select: none; font-size: 15px;
+            color: var(--gold); letter-spacing: 2px; position: relative; overflow: hidden;
+        }
+        .category-header::before {
+            content: '❦'; position: absolute; left: 14px; top: 50%;
+            transform: translateY(-50%); font-size: 28px;
+            color: rgba(196,164,74,0.12); pointer-events: none;
+        }
+        .category-header:hover { background: #252a33; }
+        .category-arrow { font-size: 12px; color: var(--gold); transition: 0.2s; opacity: 0.6; }
+        .category-arrow.open { transform: rotate(90deg); opacity: 1; }
+        .category-content {
+            display: none; padding: 10px 0 10px 20px;
+            border-left: 1px solid rgba(196,164,74,0.15); margin-left: 10px;
+        }
+        .category-content.open { display: block; }
+
+        .subcategory { margin-bottom: 6px; }
+        .subcategory-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; background: var(--bg); border: 1px solid var(--border);
+            cursor: pointer; user-select: none; font-size: 13px;
+            color: var(--text); letter-spacing: 1px;
+        }
+        .subcategory-header:hover { background: #1e2128; }
+        .subcategory-arrow { font-size: 10px; color: var(--text2); transition: 0.2s; }
+        .subcategory-arrow.open { transform: rotate(90deg); }
+        .subcategory-content {
+            display: none; padding: 6px 0 6px 14px;
+            border-left: 1px solid #2a2d35; margin-left: 8px;
+        }
+        .subcategory-content.open { display: block; }
+
+        .skill-block {
+            background: var(--card2); border: 1px solid var(--border);
+            padding: 10px 12px; margin-bottom: 6px;
+        }
+        .skill-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .skill-name { font-size: 13px; color: var(--text); }
+        .skill-desc {
+            font-size: 10px; color: var(--text2); line-height: 1.6;
+            margin-bottom: 6px; padding: 8px 10px; background: var(--bg);
+            border-left: 2px solid rgba(196,164,74,0.2);
+        }
+        .skill-desc strong { color: var(--accent-light); font-weight: normal; }
+        .skill-desc em { color: var(--gold-light); font-style: normal; }
+        .skill-progress-mini { width: 100%; height: 2px; background: var(--border); margin: 6px 0; }
+        .skill-progress-mini-fill { height: 2px; background: var(--accent); transition: width 0.3s; }
+        .skill-row-bottom { display: flex; align-items: center; justify-content: space-between; }
+        .skill-progress-text { font-size: 9px; color: var(--text3); }
+        .skill-controls { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .btn-sm {
+            width: 30px; height: 30px; border: 1px solid var(--border);
+            background: var(--bg); color: var(--text); cursor: pointer;
+            font-size: 16px; display: flex; align-items: center; justify-content: center;
+            font-family: inherit; transition: 0.15s;
+        }
+        .btn-sm:hover { background: var(--card2); }
+        .btn-sm.add { border-color: rgba(90,122,90,0.5); color: var(--green); }
+        .btn-sm.sub { border-color: rgba(139,85,85,0.5); color: var(--red); }
+        .skill-value { font-size: 14px; min-width: 28px; text-align: center; color: var(--accent); }
+        .conversion-rule { font-size: 9px; color: var(--accent); margin-top: 4px; text-align: right; opacity: 0.6; font-style: italic; }
+
+        .finance-card { background: var(--card2); border: 1px solid var(--border); padding: 12px; margin-bottom: 8px; }
+        .finance-amount { font-size: 18px; color: var(--accent); margin: 6px 0; }
+        .finance-input-row { display: flex; gap: 6px; margin-top: 8px; }
+        .finance-input-row input {
+            flex: 1; padding: 8px 10px; background: var(--bg); border: 1px solid var(--border);
+            color: var(--text); font-size: 13px; font-family: inherit;
+        }
+        .finance-input-row button {
+            padding: 8px 16px; background: var(--accent); border: none; color: #1a1d23;
+            cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+            font-family: inherit;
+        }
+
+        .book-section { margin-bottom: 10px; }
+        .book-section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; background: var(--card2); border: 1px solid var(--border);
+            cursor: pointer; user-select: none; font-size: 13px; color: var(--text); letter-spacing: 1px;
+        }
+        .book-section-arrow { font-size: 10px; color: var(--text2); transition: 0.2s; }
+        .book-section-arrow.open { transform: rotate(90deg); }
+        .book-section-content {
+            display: none; padding: 8px 0 8px 16px;
+            border-left: 1px solid rgba(196,164,74,0.15); margin-left: 8px;
+        }
+        .book-section-content.open { display: block; }
+        .book-card { background: var(--card2); border: 1px solid var(--border); padding: 12px; margin-bottom: 6px; }
+        .book-title { font-size: 14px; color: var(--text); font-style: italic; }
+        .book-author { font-size: 10px; color: var(--text2); margin-bottom: 6px; }
+        .book-chapters { display: flex; flex-wrap: wrap; gap: 3px; margin: 8px 0; }
+        .book-chapter {
+            width: 24px; height: 24px; border: 1px solid var(--border);
+            background: var(--bg); color: var(--text2); font-size: 9px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-family: inherit;
+        }
+        .book-chapter.read { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+        .book-chapter.bookmarked { border-color: var(--gold); color: var(--gold); }
+        .book-chapter.read.bookmarked { background: var(--accent); border-color: var(--gold); color: var(--bg); box-shadow: 0 0 0 1px var(--gold); }
+        .book-input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+        .book-input-row { display: flex; gap: 6px; }
+        .book-input-row input { flex: 1; }
+        .book-input-group input, .book-input-group select, select {
+            padding: 8px 10px; background: var(--bg); border: 1px solid var(--border);
+            color: var(--text); font-size: 12px; font-family: inherit;
+        }
+        .book-input-group button, button.primary {
+            padding: 10px; background: var(--accent); border: none; color: #1a1d23;
+            cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+            font-family: inherit;
+        }
+        .book-actions { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+        .btn-text {
+            padding: 5px 10px; background: transparent; border: 1px solid var(--border);
+            color: var(--text2); cursor: pointer; font-size: 9px;
+            font-family: inherit; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-text.delete { border-color: rgba(139,85,85,0.5); color: var(--red); }
+        .category-manage { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+        .category-manage input { flex: 1; min-width: 100px; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 11px; font-family: inherit; }
+
+        .inv-section { background: var(--card2); border: 1px solid var(--border); padding: 12px; margin-bottom: 10px; }
+        .inv-section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; user-select: none; color: var(--text);
+            letter-spacing: 1px; font-size: 13px; padding: 4px 0;
+        }
+        .inv-section-arrow { font-size: 10px; color: var(--text2); transition: 0.2s; }
+        .inv-section-arrow.open { transform: rotate(90deg); }
+        .inv-section-content { display: none; margin-top: 8px; }
+        .inv-section-content.open { display: block; }
+        .inv-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 7px 10px; background: var(--bg); margin: 3px 0; font-size: 12px;
+        }
+        .inv-sort-row { display: flex; gap: 4px; margin-bottom: 6px; }
+        .inv-add-row { display: flex; gap: 4px; margin-top: 6px; }
+        .inv-add-row input { flex: 1; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 12px; font-family: inherit; }
+        .inv-add-row button { padding: 7px 14px; background: var(--accent); border: none; color: #1a1d23; cursor: pointer; font-family: inherit; }
+
+        .gear-select-card { background: var(--card2); border: 1px solid var(--border); padding: 12px; margin-bottom: 10px; }
+        .gear-item {
+            display: flex; align-items: center; gap: 8px; padding: 8px;
+            background: var(--bg); margin: 4px 0; cursor: pointer;
+            border: 1px solid transparent; transition: 0.2s;
+        }
+        .gear-item:hover { border-color: var(--border); }
+        .gear-item.selected { border-color: var(--gold); background: rgba(196,164,74,0.05); }
+        .gear-checkbox {
+            width: 18px; height: 18px; border: 1px solid var(--border);
+            background: var(--bg); display: flex; align-items: center; justify-content: center;
+            font-size: 11px; color: var(--gold); flex-shrink: 0;
+        }
+        .gear-stats { margin-top: 10px; padding: 10px; background: var(--bg); border-left: 2px solid var(--gold); font-size: 11px; }
+
+        .stat-period-selector { display: flex; gap: 4px; margin-bottom: 12px; }
+        .period-btn {
+            flex: 1; padding: 8px; background: var(--bg); border: 1px solid var(--border);
+            color: var(--text2); cursor: pointer; font-size: 10px;
+            font-family: inherit; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .period-btn.active { border-color: var(--gold); color: var(--gold); }
+        .stat-summary { background: var(--card2); border: 1px solid var(--border); padding: 14px; margin-bottom: 10px; }
+        .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 12px; }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-row .label { color: var(--text2); }
+        .stat-row .value { color: var(--accent); font-weight: bold; }
+
+        .btn-reset {
+            width: 100%; padding: 12px; background: transparent;
+            border: 1px solid #3a3030; color: #665555; cursor: pointer;
+            font-size: 10px; text-transform: uppercase; letter-spacing: 3px;
+            margin-top: 14px; font-family: inherit;
+        }
+        .btn-reset:hover { border-color: var(--red); color: var(--red); }
+        select option { background: var(--bg); color: var(--text); }
+        
+        .toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--accent); color: #1a1d23; padding: 10px 24px;
+            border-radius: 4px; font-size: 12px; z-index: 999;
+            font-family: inherit; letter-spacing: 1px;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="app-title">Life RPG</div>
+        <div class="app-subtitle">Трекер развития</div>
+        <div class="datetime" id="datetimeDisplay"></div>
+        
+        <div class="data-actions">
+            <button class="data-btn export" onclick="exportData()">📤 Экспорт</button>
+            <button class="data-btn import" onclick="importData()">📥 Импорт</button>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('stats')">Хар-ки</button>
+            <button class="tab" onclick="switchTab('books')">Книги</button>
+            <button class="tab" onclick="switchTab('inventory')">Инвентарь</button>
+            <button class="tab" onclick="switchTab('gear')">Экип-ка</button>
+            <button class="tab" onclick="switchTab('statistics')">Стат-ка</button>
+        </div>
+        
+        <!-- ХАРАКТЕРИСТИКИ -->
+        <div class="page active" id="page-stats">
+            <div class="stats-card">
+                <div class="stats-row">
+                    <div class="stat-item"><div class="stat-value" id="intellectDisplay">0</div><div class="stat-label">Интеллект</div><div class="stat-detail" id="intellectBreakdown"></div></div>
+                    <div class="stat-item"><div class="stat-value" id="sportDisplay">0</div><div class="stat-label">Спорт</div><div class="stat-detail" id="sportBreakdown"></div></div>
+                    <div class="stat-item"><div class="stat-value" id="financeDisplay">0</div><div class="stat-label">Финансы</div><div class="stat-detail" id="financeBreakdown"></div></div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-header" onclick="toggleCategory(this)"><span style="margin-left:32px;">Интеллект</span><span class="category-arrow">▸</span></div>
+                <div class="category-content">
+                    <div class="skill-block"><div class="skill-header"><span class="skill-name">1.1 Науки</span></div><div class="skill-desc">Университетские курсы. <strong>1 курс</strong> = <em>+10 очков</em> → <em>+1 Интеллект</em>.</div><div class="skill-progress-mini"><div class="skill-progress-mini-fill" id="sciencesBar" style="width:0%"></div></div><div class="skill-row-bottom"><span class="skill-progress-text" id="sciencesProgress">0/10</span><div class="skill-controls"><button class="btn-sm sub" onclick="changeSkill('sciences',-1)">−</button><span class="skill-value" id="sciencesCount">0</span><button class="btn-sm add" onclick="changeSkill('sciences',1)">+</button></div></div></div>
+                    <div class="skill-block"><div class="skill-header"><span class="skill-name">1.2 Познания</span></div><div class="skill-desc"><strong>1 глава</strong> = <em>+1 очко</em>. <strong>10</strong> → <em>+1 Интеллект</em>.</div><div class="skill-progress-mini"><div class="skill-progress-mini-fill" id="knowledgeBar" style="width:0%"></div></div><div class="skill-row-bottom"><span class="skill-progress-text" id="knowledgeProgress">0/10</span><div class="skill-controls"><button class="btn-sm sub" onclick="changeSkill('knowledge',-1)">−</button><span class="skill-value" id="knowledgeCount">0</span><button class="btn-sm add" onclick="changeSkill('knowledge',1)">+</button></div></div></div>
+                    <div class="skill-block"><div class="skill-header"><span class="skill-name">1.3 Мудрость</span></div><div class="skill-desc"><strong>1 задание</strong> = <em>+1 очко</em>. <strong>10</strong> → <em>+1 Интеллект</em>.</div><div class="skill-progress-mini"><div class="skill-progress-mini-fill" id="wisdomBar" style="width:0%"></div></div><div class="skill-row-bottom"><span class="skill-progress-text" id="wisdomProgress">0/10</span><div class="skill-controls"><button class="btn-sm sub" onclick="changeSkill('wisdom',-1)">−</button><span class="skill-value" id="wisdomCount">0</span><button class="btn-sm add" onclick="changeSkill('wisdom',1)">+</button></div></div></div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-header" onclick="toggleCategory(this)"><span style="margin-left:32px;">Спорт</span><span class="category-arrow">▸</span></div>
+                <div class="category-content">
+                    <div class="skill-block"><div class="skill-header"><span class="skill-name">2.1 Бег</span></div><div class="skill-desc"><strong>Скорость:</strong> −1 сек/км за неделю → <em>+1</em>. <strong>Дистанция:</strong> +1 км за неделю → <em>+1</em>. <strong>10</strong> → <em>+1 Спорт</em>.</div><div class="skill-progress-mini"><div class="skill-progress-mini-fill" id="runningBar" style="width:0%"></div></div><div class="skill-row-bottom"><span class="skill-progress-text" id="runningProgress">0/10</span><div class="skill-controls"><button class="btn-sm sub" onclick="changeSkill('running',-1)">−</button><span class="skill-value" id="runningCount">0</span><button class="btn-sm add" onclick="changeSkill('running',1)">+</button></div></div></div>
+                    <div class="subcategory"><div class="subcategory-header" onclick="toggleSubcategory(this)"><span>2.2 Сила</span><span class="subcategory-arrow">▸</span></div><div class="subcategory-content">
+                        <div class="skill-block"><div class="skill-header"><span class="skill-name">Отжимания</span></div><div class="skill-desc">+10 повторов → <em>+1</em>.</div><div class="skill-row-bottom"><span class="skill-progress-text"></span><div class="skill-controls"><button class="btn-sm sub" onclick="changeSkill('pushups',-1)">−</button><span class="skill-value" id="pushupsCount">0</span><button class="btn-sm add" onclick="changeSkill('pushups',1)">+</button></div></div></div>
+                        <div class="skill-block"><div class="skill-header"><span class="skill-name">Подтягивания</span></div><div class="skill-desc">+3 повтора → <em>+1</em>.</div><div class="skill-row-bottom"><span class="skill-progress-text"></span><div class="skill-controls"><button class="btn-sm sub" onclick="changeSkill('pullups',-1)">−</button><span class="skill-value" id="pullupsCount">0</span><button class="btn-sm add" onclick="changeSkill('pullups',1)">+</button></div></div></div>
+                        <div class="skill-block"><div class="skill-header"><span class="skill-name">Берпи</span></div><div class="skill-desc">+1 повтор → <em>+1</em>.</div><div class="skill-row-bottom"><span class="skill-progress-text"></span><div class="skill-controls"><button class="btn-sm sub" onclick="changeSkill('burpees',-1)">−</button><span class="skill-value" id="burpeesCount">0</span><button class="btn-sm add" onclick="changeSkill('burpees',1)">+</button></div></div></div>
+                        <div class="skill-block"><div class="skill-header"><span class="skill-name">Жим гири 16кг</span></div><div class="skill-desc">+2 повтора → <em>+1</em>.</div><div class="skill-row-bottom"><span class="skill-progress-text"></span><div class="skill-controls"><button class="btn-sm sub" onclick="changeSkill('kettlebell',-1)">−</button><span class="skill-value" id="kettlebellCount">0</span><button class="btn-sm add" onclick="changeSkill('kettlebell',1)">+</button></div></div></div>
+                        <div class="skill-block"><div class="skill-header"><span class="skill-name">Пресс</span></div><div class="skill-desc">+2 повтора → <em>+1</em>.</div><div class="skill-row-bottom"><span class="skill-progress-text"></span><div class="skill-controls"><button class="btn-sm sub" onclick="changeSkill('abs',-1)">−</button><span class="skill-value" id="absCount">0</span><button class="btn-sm add" onclick="changeSkill('abs',1)">+</button></div></div></div>
+                    </div></div>
+                    <div class="skill-block"><div class="skill-header"><span class="skill-name">2.3 Бокс</span></div><div class="skill-desc"><strong>1 занятие</strong> = <em>+1</em>. <strong>10</strong> → <em>+1 Спорт</em>.</div><div class="skill-progress-mini"><div class="skill-progress-mini-fill" id="boxingBar" style="width:0%"></div></div><div class="skill-row-bottom"><span class="skill-progress-text" id="boxingProgress">0/10</span><div class="skill-controls"><button class="btn-sm sub" onclick="changeSkill('boxing',-1)">−</button><span class="skill-value" id="boxingCount">0</span><button class="btn-sm add" onclick="changeSkill('boxing',1)">+</button></div></div></div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <div class="category-header" onclick="toggleCategory(this)"><span style="margin-left:32px;">Финансы</span><span class="category-arrow">▸</span></div>
+                <div class="category-content">
+                    <div class="finance-card"><div class="skill-name">3.1 Накопления</div><div class="skill-desc"><strong>100 BYN</strong> = <em>+1</em>.</div><div class="finance-amount" id="savingsMoney">0 BYN</div><div class="skill-progress-mini"><div class="skill-progress-mini-fill" id="savingsBar" style="width:0%"></div></div><div class="skill-row-bottom"><span class="skill-progress-text" id="savingsProgress">0/10</span><div class="skill-controls"><button class="btn-sm sub" onclick="changeSkill('savings',-1)">−</button><span class="skill-value" id="savingsCount">0</span><button class="btn-sm add" onclick="changeSkill('savings',1)">+</button></div></div><div class="finance-input-row"><input type="number" id="savingsInput" placeholder="Сумма (BYN)"><button onclick="addSavings()">Доб.</button></div></div>
+                    <div class="finance-card"><div class="skill-name">3.2 Заработок</div><div class="skill-desc"><strong>100 BYN</strong> сверхдохода = <em>+1</em>.</div><div class="finance-amount" id="earningsMoney">0 BYN</div><div class="skill-progress-mini"><div class="skill-progress-mini-fill" id="earningsBar" style="width:0%"></div></div><div class="skill-row-bottom"><span class="skill-progress-text" id="earningsProgress">0/10</span><div class="skill-controls"><button class="btn-sm sub" onclick="changeSkill('earnings',-1)">−</button><span class="skill-value" id="earningsCount">0</span><button class="btn-sm add" onclick="changeSkill('earnings',1)">+</button></div></div><div class="finance-input-row"><input type="number" id="earningsInput" placeholder="Сумма (BYN)"><button onclick="addEarnings()">Доб.</button></div></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- БИБЛИОТЕКА -->
+        <div class="page" id="page-books">
+            <div class="skill-desc" style="margin-bottom:10px;"><strong>Как это работает:</strong> Читайте главы — <em>+1 Познаний</em> за каждую. 10 = <em>+1 Интеллект</em>.</div>
+            <div class="category-manage"><input type="text" id="newCategoryInput" placeholder="Новая категория"><button class="primary" onclick="addBookCategory()">Создать</button></div>
+            <div style="display:flex;gap:6px;margin-bottom:10px;"><select id="bookSortSelect" onchange="renderBooks()"><option value="category">По категориям</option><option value="title">По названию</option><option value="author">По автору</option><option value="progress">По прогрессу</option></select></div>
+            <div class="book-input-group"><input type="text" id="bookTitle" placeholder="Название книги"><div class="book-input-row"><input type="text" id="bookAuthor" placeholder="Автор"><input type="number" id="bookChapters" placeholder="Глав" min="1" value="10" style="max-width:70px;"></div><select id="bookCategorySelect"><option value="">Без категории</option></select><button class="primary" onclick="addBook()">Добавить книгу</button></div>
+            <div id="booksList"></div>
+        </div>
+        
+        <!-- ИНВЕНТАРЬ -->
+        <div class="page" id="page-inventory">
+            <div class="inv-section"><div class="inv-section-header" onclick="toggleInvSection(this)"><span>Интеллект</span><span class="inv-section-arrow">▸</span></div><div class="inv-section-content"><div class="inv-sort-row"><select onchange="sortInventory('intellect',this.value)"><option value="newest">Новые</option><option value="oldest">Старые</option><option value="az">А→Я</option><option value="za">Я→А</option></select></div><div id="inv-intellect"></div><div class="inv-add-row"><input type="text" id="invIntellectInput" placeholder="Предмет"><button class="primary" onclick="addItem('intellect')">+</button></div></div></div>
+            <div class="inv-section"><div class="inv-section-header" onclick="toggleInvSection(this)"><span>Спорт</span><span class="inv-section-arrow">▸</span></div><div class="inv-section-content"><div class="inv-sort-row"><select onchange="sortInventory('sport',this.value)"><option value="newest">Новые</option><option value="oldest">Старые</option><option value="az">А→Я</option><option value="za">Я→А</option></select></div><div id="inv-sport"></div><div class="inv-add-row"><input type="text" id="invSportInput" placeholder="Предмет"><button class="primary" onclick="addItem('sport')">+</button></div></div></div>
+            <div class="inv-section"><div class="inv-section-header" onclick="toggleInvSection(this)"><span>Финансы</span><span class="inv-section-arrow">▸</span></div><div class="inv-section-content"><div class="inv-sort-row"><select onchange="sortInventory('finance',this.value)"><option value="newest">Новые</option><option value="oldest">Старые</option><option value="az">А→Я</option><option value="za">Я→А</option></select></div><div id="inv-finance"></div><div class="inv-add-row"><input type="text" id="invFinanceInput" placeholder="Предмет"><button class="primary" onclick="addItem('finance')">+</button></div></div></div>
+        </div>
+        
+        <!-- ЭКИПИРОВКА -->
+        <div class="page" id="page-gear">
+            <div class="skill-desc" style="margin-bottom:10px;">Выберите экипировку для тренировки. Статистика покажет суммарный опыт в выбранных предметах.</div>
+            <div class="gear-select-card"><div class="inv-section-header" onclick="toggleInvSection(this)"><span>👟 Обувь</span><span class="inv-section-arrow">▸</span></div><div class="inv-section-content" id="gear-shoes"></div></div>
+            <div class="gear-select-card"><div class="inv-section-header" onclick="toggleInvSection(this)"><span>👕 Одежда</span><span class="inv-section-arrow">▸</span></div><div class="inv-section-content" id="gear-clothes"></div></div>
+            <div class="gear-select-card"><div class="inv-section-header" onclick="toggleInvSection(this)"><span>🏋️ Инвентарь</span><span class="inv-section-arrow">▸</span></div><div class="inv-section-content" id="gear-equipment"></div></div>
+            <div class="gear-stats" id="gearStatsDisplay"><em>Выберите предметы для отображения статистики</em></div>
+        </div>
+        
+        <!-- СТАТИСТИКА -->
+        <div class="page" id="page-statistics">
+            <div class="stat-period-selector">
+                <button class="period-btn active" onclick="setStatPeriod('day')">День</button>
+                <button class="period-btn" onclick="setStatPeriod('week')">Неделя</button>
+                <button class="period-btn" onclick="setStatPeriod('month')">Месяц</button>
+                <button class="period-btn" onclick="setStatPeriod('all')">Всё время</button>
+            </div>
+            <div id="statisticsContent"></div>
+        </div>
+        
+        <button class="btn-reset" onclick="resetAll()">Сбросить всё</button>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="handleFileImport(event)">
+
+    <script>
+        // Регистрация Service Worker для офлайн-работы
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                var swCode = 'self.addEventListener("install",function(e){self.skipWaiting()});self.addEventListener("activate",function(e){e.waitUntil(clients.claim())});self.addEventListener("fetch",function(e){e.respondWith(fetch(e.request).catch(function(){return new Response("",{status:200,headers:{"Content-Type":"text/html"}})}))});';
+                var blob = new Blob([swCode], {type: 'application/javascript'});
+                var swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl).catch(function(err) {
+                    console.log('Service Worker не зарегистрирован (локальный файл):', err.message);
+                });
+            });
+        }
+        
+        // ===== ДАННЫЕ =====
+        var data = {
+            skills: {sciences:0,knowledge:0,wisdom:0,running:0,pushups:0,pullups:0,burpees:0,kettlebell:0,abs:0,boxing:0,savings:0,earnings:0},
+            savingsTotal:0, earningsTotal:0,
+            books:[], bookCategories:[],
+            inventory:{intellect:[],sport:[],finance:[]},
+            invSort:{intellect:'newest',sport:'newest',finance:'newest'},
+            gearHistory:[],
+            statPeriod:'day'
+        };
+        
+        function loadData() {
+            try {
+                var saved = localStorage.getItem('rpgDataV9');
+                if (saved) {
+                    var p = JSON.parse(saved);
+                    if (p.skills) for (var k in p.skills) { if (data.skills.hasOwnProperty(k)) data.skills[k] = p.skills[k]; }
+                    if (p.savingsTotal !== undefined) data.savingsTotal = p.savingsTotal;
+                    if (p.earningsTotal !== undefined) data.earningsTotal = p.earningsTotal;
+                    if (p.books) data.books = p.books;
+                    if (p.bookCategories) data.bookCategories = p.bookCategories;
+                    if (p.inventory) data.inventory = p.inventory;
+                    if (p.invSort) data.invSort = p.invSort;
+                    if (p.gearHistory) data.gearHistory = p.gearHistory;
+                }
+            } catch(e) {}
+        }
+        
+        function saveAll() { localStorage.setItem('rpgDataV9', JSON.stringify(data)); }
+        
+        function exportData() {
+            var exportObj = {version:'1.0',exportedAt:new Date().toISOString(),data:data};
+            var jsonStr = JSON.stringify(exportObj, null, 2);
+            var blob = new Blob([jsonStr], {type:'application/json'});
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a'); a.href = url;
+            var now = new Date();
+            var filename = 'life-rpg-backup-'+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'.json';
+            a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            URL.revokeObjectURL(url); showToast('✅ Экспортировано: '+filename);
+        }
+        
+        function importData() { document.getElementById('importFileInput').click(); }
+        
+        function handleFileImport(event) {
+            var file = event.target.files[0]; if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    var imported = JSON.parse(e.target.result);
+                    var importedData = (imported.data && imported.version) ? imported.data : imported;
+                    if (!importedData.skills || !importedData.inventory) throw new Error('Неверный формат');
+                    if (confirm('Импортировать данные? Текущие данные будут заменены.\n\nДата копии: '+(imported.exportedAt?new Date(imported.exportedAt).toLocaleString('ru-RU'):'неизвестно')+'\n\nПродолжить?')) {
+                        try { localStorage.setItem('rpgDataV9_backup', JSON.stringify(data)); } catch(e) {}
+                        data.skills = importedData.skills || data.skills;
+                        data.savingsTotal = importedData.savingsTotal || 0;
+                        data.earningsTotal = importedData.earningsTotal || 0;
+                        data.books = importedData.books || [];
+                        data.bookCategories = importedData.bookCategories || [];
+                        data.inventory = importedData.inventory || {intellect:[],sport:[],finance:[]};
+                        data.invSort = importedData.invSort || {intellect:'newest',sport:'newest',finance:'newest'};
+                        data.gearHistory = importedData.gearHistory || [];
+                        saveAll(); updateStats(); updateCategorySelect(); renderBooks(); renderInventory();
+                        selectedGear = {shoes:[],clothes:[],equipment:[]}; showToast('✅ Импортировано!');
+                    }
+                } catch(err) { showToast('❌ Ошибка формата файла'); }
+            };
+            reader.readAsText(file); event.target.value = '';
+        }
+        
+        function showToast(m) {
+            var t = document.getElementById('toast'); t.textContent = m; t.classList.add('show');
+            clearTimeout(t._timeout); t._timeout = setTimeout(function(){t.classList.remove('show');},2500);
+        }
+        
+        function updateDateTime() {
+            var now = new Date();
+            document.getElementById('datetimeDisplay').textContent = now.toLocaleDateString('ru-RU',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+        }
+        setInterval(updateDateTime,1000); updateDateTime();
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+            document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+            var tabs = document.querySelectorAll('.tab');
+            if(tab==='stats'){tabs[0].classList.add('active');document.getElementById('page-stats').classList.add('active');}
+            else if(tab==='books'){tabs[1].classList.add('active');document.getElementById('page-books').classList.add('active');updateCategorySelect();renderBooks();}
+            else if(tab==='inventory'){tabs[2].classList.add('active');document.getElementById('page-inventory').classList.add('active');renderInventory();}
+            else if(tab==='gear'){tabs[3].classList.add('active');document.getElementById('page-gear').classList.add('active');renderGearPage();}
+            else if(tab==='statistics'){tabs[4].classList.add('active');document.getElementById('page-statistics').classList.add('active');renderStatistics();}
+        }
+        
+        function toggleCategory(h){var c=h.nextElementSibling,a=h.querySelector('.category-arrow');c.classList.toggle('open');a.classList.toggle('open');}
+        function toggleSubcategory(h){var c=h.nextElementSibling,a=h.querySelector('.subcategory-arrow');c.classList.toggle('open');a.classList.toggle('open');}
+        function toggleInvSection(h){var c=h.nextElementSibling,a=h.querySelector('.inv-section-arrow');if(c)c.classList.toggle('open');if(a)a.classList.toggle('open');}
+        
+        function changeSkill(name,delta){if(data.skills.hasOwnProperty(name)){data.skills[name]=Math.max(0,data.skills[name]+delta);data.gearHistory.push({skill:name,delta:delta,time:Date.now()});saveAll();updateStats();}}
+        
+        function updateStats(){
+            var names=['sciences','knowledge','wisdom','running','pushups','pullups','burpees','kettlebell','abs','boxing','savings','earnings'];
+            for(var i=0;i<names.length;i++){try{document.getElementById(names[i]+'Count').textContent=data.skills[names[i]];}catch(e){}}
+            ['sciences','knowledge','wisdom','running','boxing','savings','earnings'].forEach(function(n){var val=data.skills[n]%10;try{document.getElementById(n+'Bar').style.width=(val/10*100)+'%';document.getElementById(n+'Progress').textContent=val+'/10';}catch(e){}});
+            var intellect=Math.floor(data.skills.sciences/10)+Math.floor(data.skills.knowledge/10)+Math.floor(data.skills.wisdom/10);
+            var totalStr=Math.floor(data.skills.pushups/10)+Math.floor(data.skills.pullups/10)+Math.floor(data.skills.burpees/10)+Math.floor(data.skills.kettlebell/10)+Math.floor(data.skills.abs/10);
+            var sport=Math.floor(totalStr/10)+Math.floor(data.skills.running/10)+Math.floor(data.skills.boxing/10);
+            var finance=Math.floor(data.skills.savings/10)+Math.floor(data.skills.earnings/10);
+            document.getElementById('intellectDisplay').textContent=intellect;document.getElementById('sportDisplay').textContent=sport;document.getElementById('financeDisplay').textContent=finance;
+            document.getElementById('intellectBreakdown').textContent='н'+Math.floor(data.skills.sciences/10)+' п'+Math.floor(data.skills.knowledge/10)+' м'+Math.floor(data.skills.wisdom/10);
+            document.getElementById('sportBreakdown').textContent='с'+Math.floor(totalStr/10)+' б'+Math.floor(data.skills.running/10)+' бк'+Math.floor(data.skills.boxing/10);
+            document.getElementById('financeBreakdown').textContent='н'+Math.floor(data.skills.savings/10)+' з'+Math.floor(data.skills.earnings/10);
+            document.getElementById('savingsMoney').textContent=data.savingsTotal+' BYN';document.getElementById('earningsMoney').textContent=data.earningsTotal+' BYN';
+        }
+        
+        function addSavings(){var v=parseInt(document.getElementById('savingsInput').value);if(v&&v>0){data.savingsTotal+=v;data.skills.savings+=Math.floor(v/100);document.getElementById('savingsInput').value='';saveAll();updateStats();}}
+        function addEarnings(){var v=parseInt(document.getElementById('earningsInput').value);if(v&&v>0){data.earningsTotal+=v;data.skills.earnings+=Math.floor(v/100);document.getElementById('earningsInput').value='';saveAll();updateStats();}}
+        
+        function addBookCategory(){var inp=document.getElementById('newCategoryInput');var name=inp.value.trim();if(name&&data.bookCategories.indexOf(name)===-1){data.bookCategories.push(name);inp.value='';saveAll();updateCategorySelect();renderBooks();}}
+        function deleteBookCategory(name){if(confirm('Удалить категорию «'+name+'»?')){data.bookCategories.splice(data.bookCategories.indexOf(name),1);data.books.forEach(function(b){if(b.category===name)b.category='';});saveAll();updateCategorySelect();renderBooks();}}
+        function updateCategorySelect(){var sel=document.getElementById('bookCategorySelect');if(!sel)return;sel.innerHTML='<option value="">Без категории</option>';data.bookCategories.forEach(function(c){sel.innerHTML+='<option value="'+c+'">'+c+'</option>';});}
+        function addBook(){var title=document.getElementById('bookTitle').value.trim();var author=document.getElementById('bookAuthor').value.trim();var chapters=parseInt(document.getElementById('bookChapters').value)||10;var category=document.getElementById('bookCategorySelect').value;if(title&&chapters>0){data.books.push({title:title,author:author||'Автор неизвестен',totalChapters:chapters,readChapters:[],bookmark:null,category:category});document.getElementById('bookTitle').value='';document.getElementById('bookAuthor').value='';document.getElementById('bookChapters').value='10';saveAll();renderBooks();updateStats();}}
+        function moveBook(index,newCategory){data.books[index].category=newCategory;saveAll();renderBooks();}
+        function toggleChapter(bi,cn){var b=data.books[bi];var idx=b.readChapters.indexOf(cn);if(idx>-1){b.readChapters.splice(idx,1);data.skills.knowledge=Math.max(0,data.skills.knowledge-1);}else{b.readChapters.push(cn);data.skills.knowledge++;data.gearHistory.push({skill:'knowledge',delta:1,time:Date.now()});}saveAll();renderBooks();updateStats();}
+        function setBookmark(bi,cn){var b=data.books[bi];b.bookmark=(b.bookmark===cn)?null:cn;saveAll();renderBooks();}
+        function deleteBook(i){data.books.splice(i,1);saveAll();renderBooks();}
+        function toggleBookSection(h){var c=h.nextElementSibling,a=h.querySelector('.book-section-arrow');c.classList.toggle('open');a.classList.toggle('open');}
+        
+        function renderBooks(){
+            var sortBy=document.getElementById('bookSortSelect')?document.getElementById('bookSortSelect').value:'category';var html='';
+            if(data.books.length===0){html='<div style="text-align:center;color:var(--text2);padding:20px;">Библиотека пуста</div>';}
+            else if(sortBy==='category'){var categories=[''].concat(data.bookCategories);categories.forEach(function(cat){var catBooks=data.books.filter(function(b){return(b.category||'')===cat;});if(catBooks.length===0)return;var catName=cat||'Без категории';html+='<div class="book-section"><div class="book-section-header" onclick="toggleBookSection(this)"><span>'+catName+' ('+catBooks.length+')</span><span style="display:flex;gap:6px;">';if(cat)html+='<button class="btn-text delete" style="font-size:8px;" onclick="event.stopPropagation();deleteBookCategory(\''+cat.replace(/'/g,"\\'")+'\')">Удалить</button>';html+='<span class="book-section-arrow">▸</span></span></div><div class="book-section-content">';catBooks.forEach(function(b){var idx=data.books.indexOf(b);html+=renderBookCard(idx,b);});html+='</div></div>';});}
+            else{var sorted=data.books.slice();if(sortBy==='title')sorted.sort(function(a,b){return a.title.localeCompare(b.title);});else if(sortBy==='author')sorted.sort(function(a,b){return a.author.localeCompare(b.author);});else if(sortBy==='progress')sorted.sort(function(a,b){return(b.readChapters.length/b.totalChapters)-(a.readChapters.length/a.totalChapters);});sorted.forEach(function(b){var idx=data.books.indexOf(b);html+=renderBookCard(idx,b);});}
+            document.getElementById('booksList').innerHTML=html;
+        }
+        
+        function renderBookCard(idx,b){
+            var h='<div class="book-card"><div class="book-title">'+b.title+'</div><div class="book-author">'+b.author+'</div>';
+            if(b.category)h+='<div style="font-size:9px;color:var(--gold);">'+b.category+'</div>';
+            h+='<div class="book-chapters">';for(var c=1;c<=b.totalChapters;c++){var cls='book-chapter';if(b.readChapters.indexOf(c)>-1)cls+=' read';if(b.bookmark===c)cls+=' bookmarked';h+='<button class="'+cls+'" onclick="toggleChapter('+idx+','+c+')">'+c+'</button>';}
+            h+='</div><div class="book-stats">Прочитано: '+b.readChapters.length+'/'+b.totalChapters+(b.bookmark?' | Закл: гл.'+b.bookmark:'')+'</div><div class="book-actions">';
+            h+='<button class="btn-text" onclick="setBookmark('+idx+','+(b.readChapters.length>0?b.readChapters[b.readChapters.length-1]:1)+')">Закладка</button>';
+            if(data.bookCategories.length>0){h+='<select onchange="moveBook('+idx+',this.value)" style="padding:4px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:9px;font-family:inherit;"><option value="">Без категории</option>';data.bookCategories.forEach(function(cat){h+='<option value="'+cat+'"'+(b.category===cat?' selected':'')+'>'+cat+'</option>';});h+='</select>';}
+            h+='<button class="btn-text delete" onclick="deleteBook('+idx+')">Удалить</button></div></div>';return h;
+        }
+        
+        function addItem(cat){var inp=document.getElementById('inv'+cat.charAt(0).toUpperCase()+cat.slice(1)+'Input');if(inp.value.trim()){data.inventory[cat].unshift(inp.value.trim());inp.value='';saveAll();renderInventory();}}
+        function removeItem(cat,idx){data.inventory[cat].splice(idx,1);saveAll();renderInventory();renderGearPage();}
+        function sortInventory(cat,sortBy){data.invSort[cat]=sortBy;var items=data.inventory[cat];if(sortBy==='az')items.sort(function(a,b){return a.localeCompare(b);});else if(sortBy==='za')items.sort(function(a,b){return b.localeCompare(a);});else if(sortBy==='oldest')items.reverse();saveAll();renderInventory();}
+        function renderInventory(){['intellect','sport','finance'].forEach(function(cat){var items=data.inventory[cat].slice();var h='';if(items.length===0)h='<div style="color:var(--text2);font-size:11px;">—</div>';else for(var i=0;i<items.length;i++)h+='<div class="inv-item"><span>'+items[i]+'</span><span style="color:var(--red);cursor:pointer;" onclick="removeItem(\''+cat+'\','+i+')">×</span></div>';document.getElementById('inv-'+cat).innerHTML=h;});}
+        
+        var selectedGear={shoes:[],clothes:[],equipment:[]};
+        function renderGearPage(){var sportItems=data.inventory.sport;['shoes','clothes','equipment'].forEach(function(section){var container=document.getElementById('gear-'+section);var h='';if(sportItems.length===0){h='<div style="color:var(--text2);font-size:11px;">Нет предметов в инвентаре «Спорт»</div>';}else{sportItems.forEach(function(item){var isSelected=selectedGear[section].indexOf(item)>-1;h+='<div class="gear-item'+(isSelected?' selected':'')+'" onclick="toggleGear(\''+section+'\',\''+item.replace(/'/g,"\\'")+'\')"><div class="gear-checkbox">'+(isSelected?'✓':'')+'</div><span>'+item+'</span></div>';});}container.innerHTML=h;});updateGearStats();}
+        function toggleGear(section,item){var idx=selectedGear[section].indexOf(item);if(idx>-1)selectedGear[section].splice(idx,1);else selectedGear[section].push(item);renderGearPage();}
+        function updateGearStats(){var allSelected=selectedGear.shoes.concat(selectedGear.clothes).concat(selectedGear.equipment);var display=document.getElementById('gearStatsDisplay');if(allSelected.length===0){display.innerHTML='<em>Выберите предметы для отображения статистики</em>';return;}var now=Date.now();var weekAgo=now-7*24*60*60*1000;var recentHistory=data.gearHistory.filter(function(h){return h.time>weekAgo;});var totalSkills={};recentHistory.forEach(function(h){if(!totalSkills[h.skill])totalSkills[h.skill]=0;totalSkills[h.skill]+=Math.abs(h.delta);});var h='<strong>Статистика за неделю с выбранной экипировкой:</strong><br>';h+='Предметов выбрано: '+allSelected.length+'<br>';h+='Всего действий: '+recentHistory.length+'<br>';if(Object.keys(totalSkills).length>0){var sn={running:'Бег',pushups:'Отжимания',pullups:'Подтягивания',burpees:'Берпи',kettlebell:'Жим гири',abs:'Пресс',boxing:'Бокс',knowledge:'Познания',sciences:'Науки',wisdom:'Мудрость'};for(var sk in totalSkills){h+=(sn[sk]||sk)+': +'+totalSkills[sk]+' очков<br>';}}display.innerHTML=h;}
+        
+        function setStatPeriod(period){data.statPeriod=period;document.querySelectorAll('.period-btn').forEach(function(b){b.classList.remove('active');});if(period==='day')document.querySelectorAll('.period-btn')[0].classList.add('active');else if(period==='week')document.querySelectorAll('.period-btn')[1].classList.add('active');else if(period==='month')document.querySelectorAll('.period-btn')[2].classList.add('active');else document.querySelectorAll('.period-btn')[3].classList.add('active');saveAll();renderStatistics();}
+        
+        function renderStatistics(){
+            var now=Date.now();var periodStart=0;if(data.statPeriod==='day')periodStart=now-24*60*60*1000;else if(data.statPeriod==='week')periodStart=now-7*24*60*60*1000;else if(data.statPeriod==='month')periodStart=now-30*24*60*60*1000;
+            var filteredHistory=data.gearHistory.filter(function(h){return h.time>=periodStart;});
+            var stats={};filteredHistory.forEach(function(h){if(!stats[h.skill])stats[h.skill]=0;stats[h.skill]+=Math.abs(h.delta);});
+            var sn={sciences:'Науки',knowledge:'Познания',wisdom:'Мудрость',running:'Бег',pushups:'Отжимания',pullups:'Подтягивания',burpees:'Берпи',kettlebell:'Жим гири',abs:'Пресс',boxing:'Бокс',savings:'Накопления',earnings:'Заработок'};
+            var totalActions=filteredHistory.length;var totalPoints=0;for(var k in stats)totalPoints+=stats[k];
+            var pn={day:'за день',week:'за неделю',month:'за месяц',all:'за всё время'};
+            var html='<div class="stat-summary"><div style="font-size:13px;color:var(--gold);margin-bottom:8px;">📊 Статистика '+pn[data.statPeriod]+'</div>';
+            html+='<div class="stat-row"><span class="label">Всего действий</span><span class="value">'+totalActions+'</span></div>';
+            html+='<div class="stat-row"><span class="label">Всего очков</span><span class="value">'+totalPoints+'</span></div>';
+            html+='<div class="stat-row"><span class="label">Накоплено средств</span><span class="value">'+data.savingsTotal+' BYN</span></div>';
+            html+='<div class="stat-row"><span class="label">Сверхдоход</span><span class="value">'+data.earningsTotal+' BYN</span></div>';
+            var en=['running','pushups','pullups','burpees','kettlebell','abs','boxing'];var hes=false;en.forEach(function(sk){if(stats[sk]&&stats[sk]>0)hes=true;});
+            if(hes){html+='<div style="font-size:11px;color:var(--accent);margin-top:10px;">Спорт:</div>';en.forEach(function(sk){if(stats[sk])html+='<div class="stat-row"><span class="label">'+sn[sk]+'</span><span class="value">+'+stats[sk]+' очков</span></div>';});}
+            var mn=['knowledge','sciences','wisdom'];var hms=false;mn.forEach(function(sk){if(stats[sk]&&stats[sk]>0)hms=true;});
+            if(hms){html+='<div style="font-size:11px;color:var(--accent);margin-top:10px;">Интеллект:</div>';mn.forEach(function(sk){if(stats[sk])html+='<div class="stat-row"><span class="label">'+sn[sk]+'</span><span class="value">+'+stats[sk]+' очков</span></div>';});}
+            html+='</div>';if(totalActions===0&&data.statPeriod!=='all'){html+='<div style="text-align:center;color:var(--text2);padding:10px;">Нет данных за этот период</div>';}
+            document.getElementById('statisticsContent').innerHTML=html;
+        }
+        
+        function resetAll(){if(confirm('Удалить все данные? Сделайте экспорт перед сбросом!')){data.skills={sciences:0,knowledge:0,wisdom:0,running:0,pushups:0,pullups:0,burpees:0,kettlebell:0,abs:0,boxing:0,savings:0,earnings:0};data.savingsTotal=0;data.earningsTotal=0;data.books=[];data.bookCategories=[];data.inventory={intellect:[],sport:[],finance:[]};data.gearHistory=[];selectedGear={shoes:[],clothes:[],equipment:[]};saveAll();updateStats();renderBooks();renderInventory();renderGearPage();renderStatistics();}}
+        
+        loadData(); updateStats();
+    </script>
+</body>
+</html>
